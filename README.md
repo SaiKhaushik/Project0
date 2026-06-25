@@ -55,9 +55,3 @@ It focuses on identifying security vulnerabilities in the MAVLink communication 
 - Affine Cipher (Initial Study)
 - HMAC with SHA-256
 - ChaCha20-Poly1305 Authenticated Encryption
-
----
-
-## Disclaimer
-
-This repository is intended solely for educational and research purposes. Any security testing or attack simulations should only be performed in authorized and controlled environments.
