@@ -1,4 +1,4 @@
-# Simulated Software Attacks
+# Software Attacks
 
 ## 1. Eavesdropping Attack
 
@@ -101,7 +101,7 @@ No hardcoded encryption keys were found.
 This attack checks whether the same nonce is reused during multiple encryptions, which can weaken stream cipher security.
 A fresh random nonce is generated for every encryption operation, even when encrypting identical messages.
 
-# Hardware / Physical Attacks
+# Hardware Attacks
 
 ## 1. RF Jamming
 
