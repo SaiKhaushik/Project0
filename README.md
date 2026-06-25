@@ -60,12 +60,6 @@ It focuses on identifying security vulnerabilities in the MAVLink communication 
 
 ---
 
-## Author
-
-**Sai Khaushik**
-
----
-
 ## Disclaimer
 
 This repository is intended solely for educational and research purposes. Any security testing or attack simulations should only be performed in authorized and controlled environments.
