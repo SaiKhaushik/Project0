@@ -1,8 +1,6 @@
 # Secure Internship
 Secure MAVLink Communication for UAVs
 
-> Internship Project | UAV Cybersecurity | MAVLink Security | PX4 | Gazebo | PyMAVLink
-
 ## Overview
 
 It focuses on identifying security vulnerabilities in the MAVLink communication protocol used by Unmanned Aerial Vehicles (UAVs) and designing a secure communication framework to improve message confidentiality, integrity, and authenticity. We combined simulation testing with cryptographic techniques to analyze attacks on MAVLink communication to find respective solutions.
@@ -20,7 +18,7 @@ It focuses on identifying security vulnerabilities in the MAVLink communication 
 
 ---
 
-## Simulation Environment
+## Simulation Tools
 
 | Component | Purpose |
 |-----------|---------|
