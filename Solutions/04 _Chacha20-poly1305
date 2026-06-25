@@ -1,0 +1,4 @@
+1. Overview & Proposed Solution
+We propose a Hardened MAVLink 2.0 Proxy that sits between the Ground Control Station (GCS) and the Drone. It acts as a secure tunnel, encapsulating standard MAVLink telemetry and command packets inside a cryptographically secure AEAD (Authenticated Encryption with Associated Data) wrapper.
+
+Standard drone communication protocols (like raw MAVLink) broadcast data in plaintext over radio frequencies, making them highly vulnerable. This solution utilizes the ChaCha20-Poly1305 cipher suite to secure the primary data stream, while utilizing HMAC-SHA256 strictly as a secondary, time-stamped authorization token for high-risk commands (like ARMing the drone).
