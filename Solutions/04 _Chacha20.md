@@ -2,7 +2,7 @@
 
 # **Objective**
 
-This solution considered was implementing **ChaCha20-Poly1305** to secure **MAVLink communication** by providing **confidentiality**, **integrity**, and **authentication** for every transmitted message.
+We considered implementing **ChaCha20-Poly1305** to secure **MAVLink communication** for every transmitted message.
 
 # **Why We Considered ChaCha20-Poly1305**
 
