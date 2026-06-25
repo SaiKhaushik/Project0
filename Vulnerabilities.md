@@ -2,288 +2,127 @@
 
 ## 1. Eavesdropping Attack
 
-### Description
-An attacker intercepts wireless communication and attempts to read sensitive information from transmitted packets without modifying them.
-
-### Objective
-Recover plaintext such as GPS coordinates, commands, or telemetry.
-
-### Defense
-ChaCha20 encrypts all payload data, making intercepted packets appear as random ciphertext.
+In this attack, an attacker listens to the communication between the Ground Control Station (GCS) and the UAV to capture transmitted data.
+The message is encrypted using ChaCha20 before transmission, so the intercepted packet only contains ciphertext.
 
 ### Result
-✅ Blocked – No plaintext information is exposed.
-
-
----
+The attacker cannot read any plaintext information from the captured packet.
 
 ## 2. Packet Tampering Attack
 
-### Description
-An attacker captures a legitimate encrypted packet and modifies one or more bits before forwarding it to the receiver.
-
-### Objective
-Alter commands without knowing the encryption key.
-
-### Defense
-Poly1305 authentication verifies packet integrity. Any modification changes the authentication tag.
+In this attack, one or more bits of an encrypted packet are modified before it reaches the receiver.
+Poly1305 verifies the integrity of every received packet. Even a single-bit modification changes the authentication tag.
 
 ### Result
-✅ Blocked – MAC verification fails and the packet is discarded.
-
-
----
+The modified packet fails authentication and is discarded.
 
 ## 3. Forged Packet Attack
 
-### Description
 An attacker creates a completely fake encrypted packet and sends it to the receiver.
-
-### Objective
-Inject unauthorized commands into the communication channel.
-
-### Defense
-Without the shared secret key, the attacker cannot generate a valid Poly1305 authentication tag.
+Since the attacker does not possess the secret key, a valid Poly1305 authentication tag cannot be generated.
 
 ### Result
-✅ Blocked – Forged packets are rejected.
-
-
----
+The forged packet is rejected by the receiver.
 
 ## 4. Man-in-the-Middle (MITM) Injection
 
-### Description
-An attacker positions themselves between the sender and receiver, intercepting and modifying packets before forwarding them.
-
-### Objective
-Manipulate transmitted commands while remaining undetected.
-
-### Defense
-Every packet is authenticated using Poly1305. Any modification invalidates the MAC.
+The attacker intercepts the communication, modifies the packet, and forwards it to the receiver.
+Every encrypted packet is authenticated before decryption. Any modification causes authentication failure.
 
 ### Result
-✅ Blocked – Modified packets fail authentication.
-
-
----
+The modified packet is detected and dropped.
 
 ## 5. Command Spoofing Attack
 
-### Description
-An attacker attempts to send fake drone commands pretending to be a legitimate Ground Control Station.
-
-### Objective
-Take control of the drone by issuing unauthorized commands.
-
-### Defense
-Only devices possessing the correct secret key can generate valid authenticated packets.
+The attacker attempts to send fake drone commands pretending to be the Ground Control Station.
+Only packets authenticated using the correct secret key are accepted by the receiver.
 
 ### Result
-✅ Blocked – Spoofed commands are rejected.
-
-
----
+Unauthorized commands are rejected.
 
 ## 6. Replay Attack
 
-### Description
-An attacker records a legitimate encrypted packet and retransmits it later.
-
-### Objective
-Repeat previously valid commands.
-
-### Defense
-Every packet uses a unique nonce. Previously used nonces are stored and rejected if reused.
+A previously captured valid packet is transmitted again by the attacker.
+The receiver stores previously used nonces and rejects duplicate ones.
 
 ### Result
-✅ Blocked – Duplicate packets are detected immediately.
-
-
----
+Replayed packets are detected immediately.
 
 ## 7. Predictable Nonce Attack
 
-### Description
-An attacker analyzes nonce generation hoping to predict future nonces.
-
-### Objective
-Exploit predictable nonces to weaken encryption.
-
-### Defense
-Random cryptographically secure nonce generation ensures uniqueness and unpredictability.
+This attack checks whether the generated nonces follow a predictable pattern.
+Cryptographically secure random nonce generation ensures that every encryption uses a unique nonce.
 
 ### Result
-✅ Blocked – Generated nonces remain unique.
-
-
----
+All generated nonces remain unique.
 
 ## 8. Token Brute Force Attack
 
-### Description
-An attacker repeatedly guesses authentication tokens.
-
-### Objective
-Gain unauthorized access by guessing a valid token.
-
-### Defense
-Large token space (2^56) makes brute-force computationally infeasible.
+The attacker repeatedly guesses authentication tokens hoping to obtain a valid one.
+The authentication token has a large key space, making random guessing practically impossible.
 
 ### Result
-✅ Blocked – No successful guesses.
-
-
----
+No valid token was successfully guessed.
 
 ## 9. Stale Token Replay Attack
 
-### Description
-An attacker attempts to reuse an expired authentication token.
-
-### Objective
-Authenticate using an old but previously valid token.
-
-### Defense
-Tokens include timestamps and are accepted only within a predefined validity window.
+An attacker attempts to authenticate using an expired authentication token.
+Each token is checked against its validity period before authentication.
 
 ### Result
-✅ Blocked – Expired tokens are rejected.
-
-
----
+Expired tokens are rejected.
 
 ## 10. Rate-Limit / Lockout Attack
 
-### Description
-An attacker performs repeated authentication attempts to guess credentials.
-
-### Objective
-Eventually authenticate through repeated failures.
-
-### Defense
-After multiple failed attempts, the system temporarily locks further authentication requests.
+This attack performs repeated authentication attempts within a short period.
+After multiple failed attempts, the system temporarily blocks further requests.
 
 ### Result
-✅ Blocked – Lockout mechanism activated.
-
-
----
+Repeated attempts are automatically locked out.
 
 ## 11. GPS AAD Tampering Attack
 
-### Description
-An attacker modifies GPS coordinates that are included as Additional Authenticated Data (AAD).
-
-### Objective
-Redirect or manipulate drone navigation without changing the encrypted payload.
-
-### Defense
-AAD is authenticated by Poly1305. Any modification changes the authentication tag.
+In this attack, the GPS coordinates included as Additional Authenticated Data (AAD) are modified.
+The GPS coordinates are authenticated together with the encrypted message. Any change causes authentication failure.
 
 ### Result
-✅ Blocked – Authentication fails and the packet is discarded.
-
-
----
+The tampered packet is rejected.
 
 ## 12. Hardcoded Key Discovery
 
-### Description
-An attacker examines the application's source code looking for embedded encryption keys.
-
-### Objective
-Recover secret cryptographic keys directly from the program.
-
-### Defense
-No cryptographic keys are hardcoded inside the source code.
+The source code is inspected to check whether encryption keys are stored directly in the program.
+The implementation loads cryptographic keys securely instead of embedding them in the source code.
 
 ### Result
-✅ Blocked – No embedded keys found.
-
-
----
+No hardcoded encryption keys were found.
 
 ## 13. Nonce Reuse Catastrophe
 
-### Description
-Nonce reuse in stream ciphers can reveal information about the plaintext and compromise encryption security.
+This attack checks whether the same nonce is reused during multiple encryptions, which can weaken stream cipher security.
+A fresh random nonce is generated for every encryption operation, even when encrypting identical messages.
 
-### Objective
-Exploit reused nonces to recover encrypted data.
-
-### Defense
-Every encryption operation generates a fresh unique nonce, even for identical messages.
-
-### Result
-✅ Blocked – Identical plaintexts produce different ciphertexts every time.
-
-
-# Residual Hardware / Physical Attacks
+# Hardware / Physical Attacks
 
 ## 1. RF Jamming
 
-### Description
-An attacker transmits powerful radio signals on the communication frequency, preventing legitimate communication.
+An attacker transmits high-power radio signals to interfere with communication between the Ground Control Station and the UAV.
 
-### Objective
-Disrupt communication between the Ground Control Station and the UAV.
-
-### Software Defense
-None.
-
-### Hardware Mitigation
-- Frequency Hopping Spread Spectrum (FHSS)
-- Adaptive frequency selection
-- Directional antennas
-- Higher transmission power
+This attack cannot be prevented by encryption because the communication channel itself is disrupted. Hardware-based techniques such as Frequency Hopping Spread Spectrum (FHSS) are required.
 
 ### Result
-⚠ Cannot be prevented by encryption alone.
-
-
----
+Communication becomes unavailable until the interference is removed.
 
 ## 2. GPS Spoofing
 
-### Description
-An attacker broadcasts counterfeit GPS signals stronger than legitimate satellite signals.
+An attacker broadcasts fake GPS signals that are stronger than the legitimate satellite signals, causing the UAV to calculate an incorrect location.
 
-### Objective
-Cause the drone to calculate an incorrect position and navigate to a false location.
-
-### Software Defense
-GPS coordinates can be authenticated during transmission, but fake satellite signals cannot be detected solely through encryption.
-
-### Hardware Mitigation
-- Multi-constellation GNSS
-- IMU and sensor fusion
-- Anti-spoofing GNSS receivers
-- RTK GPS
+Encryption protects GPS data during transmission but cannot verify whether the received satellite signals are genuine. Multi-constellation GNSS and sensor fusion are commonly used to detect spoofing.
 
 ### Result
-⚠ Requires specialized navigation hardware.
-
-
----
+Requires dedicated navigation hardware for protection.
 
 ## 3. Endpoint Compromise
 
-### Description
-An attacker gains physical or software access to the drone or Ground Control Station.
+The attacker gains physical or software access to the UAV or the Ground Control Station and attempts to extract keys or modify the firmware.
 
-### Objective
-Steal secret keys, modify firmware, or bypass cryptographic protection.
-
-### Software Defense
-Limited.
-
-### Hardware Mitigation
-- Secure Boot
-- Hardware Security Module (HSM)
-- Trusted Platform Module (TPM)
-- Secure firmware signing
-- Trusted Execution Environment (TEE)
-
-### Result
-⚠ Cryptography cannot protect a compromised endpoint.
+Once a device is compromised, encryption alone cannot protect stored secrets. Secure Boot, Hardware Security Modules (HSM), and firmware verification are required.
